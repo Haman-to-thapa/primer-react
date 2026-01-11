@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchApi } from "../api/api";
+import { fetchArtworks } from "../api/api";
 
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -9,6 +9,7 @@ import { Column } from "primereact/column";
 function Table() {
   const [dataFetching, setDataFetching] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedRow, setSelectedRows] = useState<any[]>([])
 
 
 
@@ -16,7 +17,7 @@ function Table() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const response = await fetchApi();
+        const response = await fetchArtworks();
         console.log(response)
         setDataFetching(response.data);
       } catch (error) {
@@ -38,12 +39,14 @@ function Table() {
         value={dataFetching}
         loading={loading}
         dataKey="id"
-
+        selection={selectedRow}
+        onSelectionChange={(e) => setSelectedRows(e.value)}
+        selectionMode="multiple"
       >
         <Column
           selectionMode="multiple"
           headerStyle={{ width: "3rem" }}
-          bodyStyle={{ paddingLeft: "0rem", textAlign: "center" }}
+
 
         />
 

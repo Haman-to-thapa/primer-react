@@ -1,12 +1,8 @@
-
 import Table from './components/Table'
 
-function App() {
-
+const App = () => {
   return (
-    <main>
-      <Table />
-    </main>
+    <Table />
   )
 }
 

@@ -1,11 +1,4 @@
 @import "tailwindcss";
 
-@layer utilities {
-  .p-checkbox {
-    @apply scale-165;
-  }
 
-  .p-checkbox-box {
-    @apply w-10;
-  }
-}
+
