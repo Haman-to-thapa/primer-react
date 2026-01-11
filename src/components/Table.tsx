@@ -3,12 +3,12 @@ import { fetchArtworks } from "../api/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import Pagination from "./Pagination";
+import TitleFilterHeader from "./TitleFilterHeader.tsx";
 
 function Table() {
-  const [dataFetching, setDataFetching] = useState<any[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
-
 
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
@@ -16,62 +16,66 @@ function Table() {
   const [currentPage, setCurrentPage] = useState(1);
 
 
+  const handleNumberSelect = (num: number) => {
+    console.log(`Selecting ${num} rows`);
+    const newSelection = data.slice(0, Math.min(num, data.length));
+    setSelectedRows(newSelection);
+  };
+
   useEffect(() => {
     loadData(currentPage);
   }, []);
 
-
   const loadData = async (page: number) => {
     try {
       setLoading(true);
-      const response = await fetchArtworks(page);
-      console.log("API Response:", response);
+      const res = await fetchArtworks(page);
 
-      setDataFetching(response.data);
+      setData(res.data);
+      setTotalRecords(res.pagination.total);
 
-      setTotalRecords(response.pagination.total);
-
-
-
-      const newFirst = (page - 1) * rows;
-      setFirst(newFirst);
-      setCurrentPage(page)
-
-
-    } catch (error) {
-      console.error("Error fetching data:", error);
+      setFirst((page - 1) * rows);
+      setCurrentPage(page);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-
-  const onPageChange = (event: any) => {
-    const newPage = Math.floor(event.first / event.rows) + 1;
-    setCurrentPage(newPage);
-    setFirst(event.first);
-    setRows(event.rows);
-    loadData(newPage);
+  const onPageChange = (e: any) => {
+    const page = Math.floor(e.first / e.rows) + 1;
+    setFirst(e.first);
+    setRows(e.rows);
+    setCurrentPage(page);
+    loadData(page);
   };
 
   return (
-    <div className="px-5">
-      <div className="mt-3">
+    <div className="px-4">
+      <div className="mb-4 p-3 bg-gray-100 rounded">
         <p>Selected rows: {selectedRows.length}</p>
         <p>Current page: {currentPage}</p>
       </div>
+
       <DataTable
-        value={dataFetching}
+        value={data}
         loading={loading}
         dataKey="id"
         selection={selectedRows}
         onSelectionChange={(e) => setSelectedRows(e.value)}
         selectionMode="multiple"
       >
+
         <Column
           selectionMode="multiple"
           headerStyle={{ width: "3rem" }}
           exportable={false}
+          header={
+            <div className="flex items-center justify-center">
+              <TitleFilterHeader onNumberSelect={handleNumberSelect} />
+            </div>
+          }
         />
 
         <Column field="title" header="Title" />
@@ -82,8 +86,7 @@ function Table() {
         <Column field="date_end" header="End Year" />
       </DataTable>
 
-
-      {dataFetching.length > 0 && (
+      {data.length > 0 && (
         <Pagination
           first={first}
           rows={rows}
@@ -91,8 +94,6 @@ function Table() {
           onPageChange={onPageChange}
         />
       )}
-
-
     </div>
   );
 }
