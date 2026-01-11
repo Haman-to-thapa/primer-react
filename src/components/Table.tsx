@@ -3,6 +3,8 @@ import { fetchApi } from "../api/api";
 
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Checkbox } from 'primereact/checkbox';
+
 
 function Table() {
   const [dataFetching, setDataFetching] = useState<any[]>([]);
